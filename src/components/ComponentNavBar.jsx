@@ -1,0 +1,313 @@
+// src/components/NavBar.jsx
+import React, { useRef, useState, useLayoutEffect, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  AppBar,
+  Toolbar,
+  Box,
+  Button,
+  IconButton,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  useMediaQuery,
+  Typography,
+} from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+import { HiOutlineShoppingBag } from "react-icons/hi2";
+import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
+import gsap from "gsap";
+import CustomLogo from "../assets/CustomLogo";
+import { ReactComponent as CapsuleIcon } from "../assets/UnuSd101.svg";
+
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+
+// Simple glyph component (kept as in your original)
+function PhoneGlyph() {
+  return (
+    <svg
+      width="45"
+      height="58"
+      viewBox="0 0 45 58"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M19.6034 57.2517C19.4855 57.2602 19.3759 57.2712 19.2451 57.2754C18.9622 57.2847 18.6004 57.2855 18.1502 57.2855H5.41927C4.96906 57.2855 4.60724 57.2847 4.32438 57.2754C3.87534 57.2606 3.51352 57.2219 3.18234 57.1539C2.7828 57.0716 2.4257 56.9462 2.09335 56.7705C1.7492 56.5884 1.43688 56.3544 1.16698 56.0746C0.897092 55.7948 0.671984 55.4717 0.496377 55.1143C0.326663 54.7696 0.205275 54.4004 0.126311 53.9854C0.0603112 53.642 0.0237772 53.2659 0.00845582 52.8014C-0.00097275 52.4756 -0.000976562 52.0474 -0.000976562 51.5055V11.2083C-0.000976562 10.6664 -0.00097275 10.2383 0.00845582 9.91239C0.0237772 9.44721 0.0603112 9.07113 0.126311 8.72852C0.205275 8.31354 0.326663 7.94418 0.496377 7.59956C0.671984 7.24186 0.897092 6.91882 1.16698 6.63926C1.43688 6.35947 1.7492 6.12529 2.09335 5.94331C2.4257 5.76771 2.78163 5.64219 3.18234 5.55981C3.51352 5.4918 3.87534 5.45315 4.32438 5.4383C4.62963 5.4284 5.02799 5.42816 5.52888 5.42816H5.77049H17.6847C17.6788 5.72599 17.6776 6.06966 17.6776 6.50455V6.59495H5.58074C5.56542 6.59495 5.55009 6.59495 5.53595 6.59495C5.02209 6.59495 4.64967 6.59507 4.3621 6.60449C3.9826 6.61699 3.68206 6.64822 3.41806 6.70267C3.12695 6.76254 2.87238 6.85164 2.63902 6.97504C2.40331 7.09926 2.19117 7.25872 2.00731 7.44929C1.8211 7.64164 1.66552 7.86521 1.54295 8.11401C1.42038 8.36398 1.33199 8.63682 1.27188 8.9482C1.21767 9.22847 1.18702 9.54644 1.17524 9.94857C1.16581 10.2648 1.16581 10.6811 1.16581 11.2081V51.5056C1.16581 52.0328 1.16581 52.449 1.17524 52.7658C1.18702 53.1668 1.21767 53.4846 1.27188 53.7657C1.33199 54.0768 1.42038 54.3497 1.54295 54.5996C1.66552 54.8481 1.8211 55.0717 2.00731 55.2643C2.18999 55.4548 2.40331 55.6142 2.63784 55.7385C2.87238 55.8621 3.12695 55.9512 3.41688 56.0109C3.68206 56.0654 3.9826 56.0966 4.36328 56.1092C4.63553 56.1182 4.98556 56.1188 5.41927 56.1188H18.1502C18.3128 56.1188 18.4531 56.1183 18.5922 56.1177C18.7713 56.3944 18.9658 56.6589 19.1944 56.8937C19.3217 57.0239 19.4631 57.1368 19.6034 57.2517ZM14.3352 7.19637H9.21192C8.59199 7.20274 8.09581 7.70929 8.1017 8.32757C8.10877 8.93677 8.60142 9.42906 9.21192 9.43542H14.334C14.9539 9.44191 15.4607 8.94596 15.4678 8.32757C15.4737 7.70917 14.9775 7.20274 14.3576 7.19637C14.3505 7.19625 14.3422 7.19625 14.3352 7.19637ZM24.2882 1.89268H24.4992L24.6983 1.8928H39.1936H39.236C39.7051 1.8928 40.0799 1.89292 40.3686 1.90223C40.754 1.91496 41.0593 1.94631 41.3268 2.00111C41.6226 2.06134 41.8807 2.15091 42.1188 2.27513C42.3569 2.39959 42.5714 2.55964 42.7588 2.75092C42.945 2.94267 43.1029 3.16613 43.2255 3.41375C43.3492 3.66372 43.4388 3.93609 43.4989 4.24594C43.5531 4.5262 43.5838 4.84359 43.5967 5.24466C43.6062 5.56217 43.6062 5.98009 43.6062 6.50974V51.4904C43.6062 52.0195 43.6062 52.4375 43.5967 52.7549C43.5838 53.1562 43.5531 53.4736 43.4989 53.7532C43.4388 54.0638 43.3492 54.3359 43.2267 54.5846C43.1029 54.8333 42.945 55.0567 42.7576 55.2491C42.5714 55.4401 42.3569 55.6001 42.1176 55.7248C41.8807 55.8489 41.6226 55.9383 41.3268 55.9985C41.0593 56.0532 40.754 56.0846 40.3686 56.0972C40.0964 56.106 39.7487 56.1069 39.3173 56.1069H39.2313H39.1394H24.4096H24.3236C23.8922 56.1069 23.5445 56.1061 23.2723 56.0973C22.8869 56.0846 22.5816 56.0532 22.3141 55.9985C22.0183 55.9383 21.7602 55.8489 21.5221 55.7244C21.284 55.5999 21.0695 55.44 20.8833 55.2491C20.6959 55.0564 20.538 54.8332 20.4154 54.5847C20.2917 54.3356 20.2021 54.0638 20.142 53.7537C20.0878 53.4733 20.0571 53.1558 20.0442 52.7545C20.0347 52.4381 20.0347 52.022 20.0347 51.4952V51.2873V6.71186V6.50408C20.0347 5.97738 20.0347 5.56122 20.0442 5.24466C20.0571 4.84336 20.0878 4.52596 20.142 4.24582C20.2021 3.93562 20.2917 3.6636 20.4154 3.41445C20.538 3.16601 20.6959 2.94255 20.8833 2.75033C21.0695 2.5594 21.284 2.39947 21.5233 2.27466C21.7602 2.15055 22.0183 2.06098 22.3141 2.00076C22.5816 1.94607 22.8869 1.9146 23.2723 1.90187C23.5363 1.89327 23.8722 1.89268 24.2882 1.89268ZM24.2882 0.714111C23.8568 0.714111 23.508 0.715408 23.2334 0.724247C22.7796 0.739215 22.4131 0.777991 22.0784 0.84623C21.673 0.928848 21.3123 1.0546 20.9764 1.23068C20.6276 1.41312 20.3117 1.64777 20.0383 1.92827C19.766 2.20842 19.5374 2.53218 19.3594 2.89058C19.1873 3.23625 19.0648 3.60644 18.9846 4.02201C18.9186 4.36556 18.8809 4.74259 18.8668 5.20824C18.8562 5.534 18.8562 5.96229 18.8562 6.50455V6.71222V51.2874V51.4951C18.8562 52.0374 18.8562 52.4657 18.8668 52.7914C18.8809 53.2569 18.9186 53.6339 18.9846 53.9776C19.0648 54.3932 19.1873 54.7634 19.3594 55.1091C19.5374 55.4672 19.766 55.791 20.0383 56.0715C20.3117 56.3521 20.6276 56.5868 20.9764 56.7691C21.3123 56.9453 21.673 57.071 22.0784 57.1535C22.4131 57.2218 22.7796 57.2604 23.2334 57.2754C23.5151 57.2846 23.8769 57.2857 24.3236 57.2857H24.5015H39.1394H39.3173C39.764 57.2857 40.1247 57.2846 40.4075 57.2754C40.8613 57.2604 41.2278 57.2218 41.5625 57.1535C41.968 57.071 42.3274 56.9453 42.6645 56.7691C43.0133 56.5868 43.3292 56.3521 43.6026 56.0715C43.8749 55.7912 44.1035 55.4675 44.2815 55.1091C44.4536 54.7634 44.575 54.3933 44.6563 53.9776C44.7223 53.6337 44.76 53.2568 44.7741 52.7914C44.7847 52.4646 44.7847 52.0344 44.7847 51.4899V6.50974C44.7847 5.96512 44.7847 5.53494 44.7741 5.20824C44.76 4.74282 44.7223 4.36591 44.6563 4.02201C44.575 3.60633 44.4524 3.23625 44.2815 2.89046C44.1035 2.53194 43.8749 2.20807 43.6026 1.92816C43.3292 1.64778 43.0133 1.413 42.6645 1.23056C42.3286 1.05448 41.968 0.928729 41.5625 0.846111C41.2278 0.777871 40.8613 0.739096 40.4075 0.724128C40.0999 0.714228 39.698 0.714111 39.1936 0.714111H38.9426H24.6983H24.4992C24.4273 0.714111 24.3566 0.714111 24.2882 0.714111ZM34.3827 2.48197H29.2594C28.6407 2.48161 28.1374 2.98262 28.1374 3.60102C28.1374 4.21942 28.6395 4.7209 29.2582 4.72125H34.3815C35.0014 4.72125 35.5035 4.22001 35.5035 3.60161C35.5035 2.98322 35.0026 2.48197 34.3827 2.48197Z"
+        fill="white"
+      />
+    </svg>
+  );
+}
+
+export default function NavBar() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
+  // Phones state (fetched from backend)
+  const [phones, setPhones] = useState([]);
+
+  // Drawer state & helpers
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const toggleDrawer = (open) => () => setDrawerOpen(open);
+  const isActive = (path) => location.pathname === path;
+
+  // Refs for GSAP + UI
+  const toolbarRef = useRef(null);
+  const iphoneWrapRef = useRef(null);
+  const iphoneLabelRef = useRef(null);
+  const capsuleRef = useRef(null);
+  const capsuleIconRef = useRef(null);
+  const panelRef = useRef(null);
+  const panelInnerRef = useRef(null);
+  const tilesRef = useRef([]);
+
+  const tlCapsule = useRef(null);
+  const tlPanel = useRef(null);
+  const closeTimer = useRef(null);
+  const hovering = useRef({ btn: false, panel: false });
+
+  // Build iphoneItems from phones state
+  const iphoneItems = phones
+    .filter((p) => p && (p.status === "Brand New" || p.isLatest))
+    .map((p) => ({
+      id: p.id ?? p._id,
+      label: p.name ?? "Unnamed",
+      phone: p,
+    }));
+
+  // Fetch phones on mount and optionally poll every N ms
+  useEffect(() => {
+    const controller = new AbortController();
+    const signal = controller.signal;
+    let intervalId = null;
+
+    async function fetchPhones() {
+      try {
+        const res = await fetch(`${API_URL}/phones`, { signal });
+        if (!res.ok) {
+          console.warn("NavBar: failed to fetch phones:", res.status);
+          return;
+        }
+        const data = await res.json();
+        if (!Array.isArray(data)) return;
+
+        // Normalize items (similar to your earlier normalization)
+        const normalized = data.map((p) => {
+          const item = p && typeof p.toObject === "function" ? p.toObject() : p;
+          return {
+            id: item.id ?? item._id,
+            infoId: item.infoId ?? item.info_id,
+            status: item.status ?? "",
+            name: item.name ?? item.title ?? "Unnamed",
+            basePrice: Number(item.basePrice ?? item.price ?? 0),
+            img: item.img ?? (Array.isArray(item.images) && item.images[0]) ?? "",
+            images: Array.isArray(item.images) ? item.images.slice(0, 5) : item.images ? [item.images] : [],
+            colors: Array.isArray(item.colors) ? item.colors : [],
+            storages: Array.isArray(item.storages)
+              ? item.storages.map((s) => ({
+                  option: s.option,
+                  price: Number(s.price ?? 0),
+                  stock: typeof s.stock === "number" ? s.stock : s.stock ? Number(s.stock) : 0,
+                }))
+              : [],
+            stock: typeof item.stock === "number" ? item.stock : 0,
+            isLatest: Boolean(item.isLatest),
+          };
+        });
+
+        setPhones(normalized);
+      } catch (err) {
+        if (err.name === "AbortError") return;
+        console.warn("NavBar fetchPhones error:", err);
+      }
+    }
+
+    // Initial fetch
+    fetchPhones();
+
+    // OPTIONAL: polling (uncomment to enable polling)
+    // intervalId = setInterval(fetchPhones, 30000); // every 30s
+
+    return () => {
+      controller.abort();
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, []); // run only once on mount
+
+  // Reinitialize GSAP context and timelines every time iphoneItems changes
+  useLayoutEffect(() => {
+    // reset tiles ref array to align with new items
+    tilesRef.current = [];
+
+    const ctx = gsap.context(() => {
+      // initial states
+      gsap.set(capsuleRef.current, { autoAlpha: 0, y: -20, scaleY: 1, transformOrigin: "30% 0%" });
+      gsap.set(capsuleIconRef.current, { opacity: 0, scaleX: 0, scaleY: 1 });
+      gsap.set(panelRef.current, { autoAlpha: 0, y: -40, scale: 0, transformOrigin: "30% 0%", opacity: 0, height: 0 });
+      gsap.set(panelInnerRef.current, { opacity: 0 });
+      tilesRef.current.forEach((tile) => gsap.set(tile, { opacity: 0, y: 10 }));
+
+      // build panel timeline
+      tlPanel.current = gsap.timeline({ paused: true, defaults: { ease: "power3.out" } })
+        .to(panelRef.current, { autoAlpha: 1, y: -25, scale: 0, opacity: 1, duration: 0.35 }, 0)
+        .to(capsuleRef.current, { autoAlpha: 1, y: 5, scaleY: 0.95, duration: 0.8 }, 0.5)
+        .to(capsuleIconRef.current, { autoAlpha: 1, y: 2, opacity: 1, scaleX: 1.1, duration: 0.9 }, 0.5)
+        .to(panelRef.current, { y: -11, scale: 1, height: "auto", duration: 0.8 }, 0.6)
+        .to(panelInnerRef.current, { opacity: 1, duration: 0.1 }, "-=0.1")
+        .to(tilesRef.current, { opacity: 1, y: 0, duration: 0.32, stagger: 0.08, ease: "power2.out" }, "-=0.2");
+
+      // capsule label timeline
+      tlCapsule.current = gsap.timeline({ paused: true, defaults: { ease: "power3.out" } })
+        .fromTo(iphoneLabelRef.current, { color: "#000" }, { color: "#ffffff", duration: 1.5 }, 0.5);
+    }, toolbarRef);
+
+    return () => {
+      // cleanup previous context/timelines
+      ctx.revert();
+      tlPanel.current = null;
+      tlCapsule.current = null;
+    };
+  }, [iphoneItems.length /* re-run when number of items changes */]);
+
+  const open = () => {
+    clearTimeout(closeTimer.current);
+    hovering.current.btn = true;
+    tlCapsule.current?.play();
+    tlPanel.current?.play();
+  };
+  const leaveBtn = () => {
+    hovering.current.btn = false;
+    scheduleClose();
+  };
+  const enterPanel = () => {
+    clearTimeout(closeTimer.current);
+    hovering.current.panel = true;
+  };
+  const leavePanel = () => {
+    hovering.current.panel = false;
+    scheduleClose();
+  };
+  const scheduleClose = () => {
+    clearTimeout(closeTimer.current);
+    closeTimer.current = setTimeout(() => {
+      if (!hovering.current.btn && !hovering.current.panel) {
+        tlPanel.current?.reverse();
+        tlCapsule.current?.reverse();
+      }
+    }, 160);
+  };
+
+  const handlePhoneClick = (phone) => {
+    navigate(`/product/${phone.id}`, {
+      state: { productData: phone, scrollTo: "top" },
+    });
+    setDrawerOpen(false);
+    tlPanel.current?.reverse();
+    tlCapsule.current?.reverse();
+  };
+
+  return (
+    <>
+      <AppBar position="absolute" sx={{ backgroundColor: "transparent", color: "black", boxShadow: "none", px: { xs: 2, sm: 0 }, zIndex: 2 }}>
+        <Toolbar ref={toolbarRef} sx={{ justifyContent: "space-between", width: { xs: "95%", md: "90%", lg: "60%" }, mx: "auto", my: { xs: 1, sm: 4 }, position: "relative", overflow: "visible" }}>
+          <Box><CustomLogo /></Box>
+
+          {!isMobile && (
+            <Box sx={{ display: "flex", gap: 8, position: "relative" }}>
+              <NavButton to="/" label="Home" active={isActive("/")} />
+
+              <Box ref={iphoneWrapRef} onMouseEnter={open} onMouseLeave={leaveBtn} sx={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Box ref={capsuleRef} sx={{ position: "absolute", inset: "-1px -50px", borderRadius: "20px", bgcolor: "#000", zIndex: 0, pointerEvents: "none", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Box ref={capsuleIconRef} sx={{ opacity: 0 }}><CapsuleIcon /></Box>
+                </Box>
+
+                <Button component={Link} to="/iphone" disableRipple sx={{ position: "relative", zIndex: 1, color: "#000", textTransform: "none", fontSize: "1.2rem", fontFamily: "SFProDisplayRegular", fontWeight: isActive("/iphone") ? 600 : 500, "&:hover": { backgroundColor: "transparent" } }}>
+                  <span ref={iphoneLabelRef}>iPhone</span>
+                </Button>
+              </Box>
+
+              <NavButton to="/airpods" label="AirPods" active={isActive("/airpods")} />
+              <NavButton to="/essentials" label="Essentials" active={isActive("/essentials")} />
+              <NavButton to="/contact" label="Contact" active={isActive("/contact")} />
+            </Box>
+          )}
+
+          <Box>
+            {isMobile ? (
+              <IconButton onClick={toggleDrawer(true)} aria-label="open menu"><HiOutlineMenu size={24} /></IconButton>
+            ) : (
+              <IconButton aria-label="view cart"><HiOutlineShoppingBag size={22} /></IconButton>
+            )}
+          </Box>
+
+          {!isMobile && (
+            <Box ref={panelRef} onMouseEnter={enterPanel} onMouseLeave={leavePanel} sx={{ position: "absolute", top: "calc(100% + 1px)", left: "50%", transform: "translateX(-50%)", width: { xs: "92vw", lg: "1300px" }, maxWidth: "1300px", background: "#000", borderRadius: "32px", color: "#fff", overflow: "hidden", zIndex: 1000, pointerEvents: "auto", height: 0 }}>
+              <Box ref={panelInnerRef} sx={{ px: 3, py: 3 }}>
+                <Box sx={{ display: "grid", gridTemplateColumns: "repeat(10, 1fr)", gap: 3, alignItems: "start" }}>
+                  {iphoneItems.map((item, idx) => (
+                    <Box
+                      key={item.id ?? idx}
+                      ref={(el) => (tilesRef.current[idx] = el)}
+                      onClick={() => handlePhoneClick(item.phone)}
+                      sx={{
+                        textAlign: "center",
+                        width: "100%",
+                        cursor: "pointer",
+                        "&:hover": { transform: "scale(1.05)", transition: "transform 0.2s ease" },
+                      }}
+                    >
+                      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", mb: 1 }}>
+                        <PhoneGlyph />
+                      </Box>
+                      <Typography sx={{ fontSize: 12, color: "rgba(255,255,255,0.9)", width: "105px" }}>{item.label}</Typography>
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
+            </Box>
+          )}
+        </Toolbar>
+      </AppBar>
+
+      <Drawer anchor="right" open={drawerOpen} onClose={toggleDrawer(false)} PaperProps={{ sx: { backgroundColor: "white", borderTopLeftRadius: "20px", borderBottomLeftRadius: "20px", width: 250 } }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", p: 2, borderBottom: "1px solid #f0f0f0" }}>
+          <CustomLogo />
+          <IconButton onClick={toggleDrawer(false)}><HiOutlineX size={22} /></IconButton>
+        </Box>
+        <List>
+          {[{ label: "Home", path: "/" }, { label: "iPhone", path: "/iphone" }, { label: "AirPods", path: "/airpods" }, { label: "Essentials", path: "/essentials" }, { label: "Contact", path: "/contact" }].map(({ label, path }) => (
+            <ListItem disablePadding key={path}>
+              <ListItemButton component={Link} to={path} onClick={toggleDrawer(false)} sx={{ fontFamily: "SFProDisplayMedium", fontWeight: location.pathname === path ? "bold" : "normal", color: "black", "&:hover": { backgroundColor: "rgba(0,0,0,0.04)", borderRadius: "10px" }, m: 0.5 }}>{label}</ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+
+        <Box sx={{ px: 2, py: 1 }}>
+          <Typography variant="h6" sx={{ fontFamily: "SFProDisplayMedium", mb: 2, pl: 1 }}>iPhones</Typography>
+          {iphoneItems.map((item) => (
+            <ListItemButton key={item.id ?? item.label} onClick={() => handlePhoneClick(item.phone)} sx={{ fontFamily: "SFProDisplayMedium", color: "black", "&:hover": { backgroundColor: "rgba(0,0,0,0.04)", borderRadius: "10px" }, m: 0.5 }}>
+              {item.label}
+            </ListItemButton>
+          ))}
+        </Box>
+
+        <Box sx={{ mt: "auto", p: 2 }}>
+          <Button fullWidth variant="outlined" startIcon={<HiOutlineShoppingBag />} sx={{ textTransform: "none", borderRadius: "15px", borderColor: "#d1d1d1", "&:hover": { borderColor: "#a1a1a1", backgroundColor: "transparent" } }}>View Cart</Button>
+        </Box>
+      </Drawer>
+    </>
+  );
+}
+
+// small nav button component
+function NavButton({ to, label, active }) {
+  return (
+    <Button component={Link} to={to} disableRipple sx={{ color: "black", textTransform: "none", fontSize: "1.2rem", fontFamily: "SFProDisplayRegular", fontWeight: active ? 600 : 500, "&:hover": { backgroundColor: "transparent" } }}>
+      {label}
+    </Button>
+  );
+}

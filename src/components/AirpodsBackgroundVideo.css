@@ -1,0 +1,38 @@
+.video-container {
+  position: static;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: white;
+  z-index: 0;
+}
+
+.video-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  object-fit: cover;
+  z-index: 1;
+}
+
+.video-overlay {
+  position: relative;
+  text-align: center;
+  color: rgb(0, 0, 0);
+  z-index: 5;
+  top: 60%;
+}
+
+.video-overlay h1 {
+  font-family: 'SFProDisplayBold';
+  letter-spacing: 1px;
+  line-height: normal;
+}
+
+.video-overlay p {
+  letter-spacing: 1px;
+  line-height: normal;
+
+}
