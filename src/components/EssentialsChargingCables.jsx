@@ -3,7 +3,10 @@ import React, { useEffect, useState } from "react";
 import { Box, Container, Typography } from "@mui/material";
 import ComponentEssentialsCard from "./ComponentEssentialsProductCard";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+// ⬇️ Import dummy accessories fallback (adjust path if needed)
+import { accessories as fallbackAccessories, API_URL as FALLBACK_API_URL } from "../data/accessories";
+
+const API_URL = process.env.REACT_APP_API_URL || FALLBACK_API_URL || "http://localhost:5000/api";
 
 export default function EssentialChargingCables() {
   const [cables, setCables] = useState([]);
@@ -11,26 +14,31 @@ export default function EssentialChargingCables() {
 
   useEffect(() => {
     const controller = new AbortController();
-    const signal = controller.signal;
+    const { signal } = controller;
 
     async function fetchAccessories() {
       try {
         setLoading(true);
+
+        // Try backend first
         const res = await fetch(`${API_URL}/accessories`, { signal });
+
         if (!res.ok) {
-          console.error("Failed to fetch accessories:", res.status);
-          setCables([]);
-          setLoading(false);
-          return;
-        }
-        const data = await res.json();
-        if (!Array.isArray(data)) {
-          setCables([]);
+          console.warn(`EssentialChargingCables: backend responded ${res.status} — using dummy accessories`);
+          setCables(mapAndFilterCables(fallbackAccessories));
           setLoading(false);
           return;
         }
 
-        // Normalize each accessory to the shape the UI expects
+        const data = await res.json();
+        if (!Array.isArray(data) || data.length === 0) {
+          console.warn("EssentialChargingCables: backend returned no array — using dummy accessories");
+          setCables(mapAndFilterCables(fallbackAccessories));
+          setLoading(false);
+          return;
+        }
+
+        // Normalize backend payload then filter to Charging Cable
         const normalized = data.map((a) => {
           const item = a && typeof a.toObject === "function" ? a.toObject() : a;
           return {
@@ -53,22 +61,45 @@ export default function EssentialChargingCables() {
           };
         });
 
-        // Keep only Charging Cables
-        const chargingCables = normalized.filter((n) => n.category === "Charging Cable");
-        setCables(chargingCables);
+        setCables(normalized.filter((n) => n.category === "Charging Cable"));
       } catch (err) {
-        if (err.name === "AbortError") return;
-        console.error("fetchAccessories error:", err);
-        setCables([]);
+        if (err.name !== "AbortError") {
+          console.warn("EssentialChargingCables: fetch failed — using dummy accessories", err);
+          setCables(mapAndFilterCables(fallbackAccessories));
+        }
       } finally {
         setLoading(false);
       }
     }
 
     fetchAccessories();
-
     return () => controller.abort();
   }, []);
+
+  // Map dummy items -> same shape; then filter to Charging Cable
+  function mapAndFilterCables(list) {
+    const safe = Array.isArray(list) ? list : [];
+    return safe
+      .filter((n) => n?.category === "Charging Cable")
+      .map((item) => ({
+        id: item.id ?? item._id,
+        infoId: item.infoId ?? item.info_id,
+        name: item.name ?? "Unnamed Accessory",
+        basePrice: Number(item.basePrice ?? item.price ?? 0),
+        stock: typeof item.stock === "number" ? item.stock : item.stock ? Number(item.stock) : 0,
+        category: item.category ?? "",
+        tags: Array.isArray(item.tags) ? item.tags : [],
+        img: item.img ?? (Array.isArray(item.images) && item.images[0]) ?? "",
+        images: Array.isArray(item.images) ? item.images.slice(0, 5) : [],
+        variants: Array.isArray(item.variants)
+          ? item.variants.map((v) => ({
+              option: v.option,
+              price: Number(v.price ?? 0),
+              stock: typeof v.stock === "number" ? v.stock : v.stock ? Number(v.stock) : 0,
+            }))
+          : [],
+      }));
+  }
 
   return (
     <Box

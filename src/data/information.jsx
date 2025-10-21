@@ -858,18 +858,341 @@
 
 
 
+// src/data/productInformation.js (or wherever you keep it)
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+export const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
 export const productInformation = [
+  // ---- iPhone 16 ------------------------------------------------------------
+  {
+    infoId: 1001,
+    sections: [
+      {
+        topic: "Overview",
+        items: [
+          {
+            subtopic: "Highlights",
+            detail:
+              "A18 chip for fast performance, 6.1\" display, upgraded camera pipeline, long battery life, and iOS features like StandBy and NameDrop.",
+          },
+          {
+            subtopic: "Condition",
+            detail:
+              "Brand New retail unit. Factory sealed with full warranty unless otherwise noted on the product page.",
+          },
+        ],
+      },
+      {
+        topic: "Display & Design",
+        items: [
+          { subtopic: "Size", detail: '6.1" OLED Super Retina display' },
+          { subtopic: "Build", detail: "Aluminum frame, Ceramic Shield front, IP68 water/dust resistance" },
+          { subtopic: "Colors", detail: "Blue, Midnight, Pink, White, Green (availability varies by region)" },
+        ],
+      },
+      {
+        topic: "Performance",
+        items: [
+          { subtopic: "Chip", detail: "Apple A18" },
+          { subtopic: "Storage Options", detail: "128 GB / 256 GB / 512 GB" },
+          { subtopic: "OS", detail: "Ships with iOS 18; eligible for future updates" },
+        ],
+      },
+      {
+        topic: "Camera",
+        items: [
+          { subtopic: "Rear", detail: "Dual-camera system with advanced computational photography" },
+          { subtopic: "Front", detail: "TrueDepth front camera with 4K video support" },
+          { subtopic: "Video", detail: "4K recording, Action mode, Cinematic mode" },
+        ],
+      },
+      {
+        topic: "Battery & Charging",
+        items: [
+          { subtopic: "Battery Life", detail: "All-day battery life (varies by use and configuration)" },
+          { subtopic: "Charging", detail: "USB-C, MagSafe & Qi wireless charging supported" },
+        ],
+      },
+      {
+        topic: "Network & SIM",
+        items: [
+          { subtopic: "5G", detail: "Sub-6 GHz and mmWave (where supported)" },
+          { subtopic: "SIM", detail: "Dual SIM support (nano-SIM + eSIM or Dual eSIM where available)" },
+        ],
+      },
+      {
+        topic: "What's in the box",
+        items: [
+          { subtopic: "Included", detail: "iPhone 16, USB-C charge cable, documentation" },
+          { subtopic: "Power Adapter", detail: "Sold separately" },
+        ],
+      },
+      {
+        topic: "Warranty & Returns",
+        items: [
+          { subtopic: "Warranty", detail: "Standard manufacturer warranty applies" },
+          { subtopic: "Returns", detail: "Subject to store policy within the return window (unused/as-new)" },
+        ],
+      },
+    ],
+    createdAt: "2025-01-05T10:00:00.000Z",
+    updatedAt: "2025-09-10T12:00:00.000Z",
+  },
+
+  // ---- iPhone 16 Plus -------------------------------------------------------
+  {
+    infoId: 1002,
+    sections: [
+      {
+        topic: "Overview",
+        items: [
+          {
+            subtopic: "Highlights",
+            detail:
+              'Bigger 6.7" display, A18 chip, excellent battery life, and the latest iOS experiences.',
+          },
+        ],
+      },
+      {
+        topic: "Display & Design",
+        items: [
+          { subtopic: "Size", detail: '6.7" OLED Super Retina display' },
+          { subtopic: "Build", detail: "Aluminum frame, Ceramic Shield front, IP68" },
+        ],
+      },
+      {
+        topic: "Performance",
+        items: [
+          { subtopic: "Chip", detail: "Apple A18" },
+          { subtopic: "Storage", detail: "128 GB / 256 GB / 512 GB" },
+        ],
+      },
+      {
+        topic: "Battery & Charging",
+        items: [
+          { subtopic: "Battery", detail: "Larger battery than iPhone 16; great endurance" },
+          { subtopic: "Charging", detail: "USB-C, MagSafe & Qi" },
+        ],
+      },
+      {
+        topic: "What's in the box",
+        items: [{ subtopic: "Included", detail: "iPhone 16 Plus, USB-C cable, documentation" }],
+      },
+    ],
+    createdAt: "2025-01-06T10:00:00.000Z",
+    updatedAt: "2025-09-10T12:00:00.000Z",
+  },
+
+  // ---- iPhone 16 Pro --------------------------------------------------------
+  {
+    infoId: 1003,
+    sections: [
+      {
+        topic: "Overview",
+        items: [
+          {
+            subtopic: "Highlights",
+            detail:
+              "Titanium design, A18 Pro chip, ProMotion display, powerful cameras, and USB-C with high-speed data.",
+          },
+        ],
+      },
+      {
+        topic: "Display & Design",
+        items: [
+          { subtopic: "Size", detail: '6.3" ProMotion OLED, up to 120Hz' },
+          { subtopic: "Build", detail: "Grade 5 titanium frame, Ceramic Shield, IP68" },
+          { subtopic: "Colors", detail: "Natural Titanium, Blue Titanium, Black Titanium, White Titanium" },
+        ],
+      },
+      {
+        topic: "Performance",
+        items: [
+          { subtopic: "Chip", detail: "Apple A18 Pro" },
+          { subtopic: "Storage", detail: "256 GB / 512 GB / 1 TB" },
+        ],
+      },
+      {
+        topic: "Camera",
+        items: [
+          { subtopic: "System", detail: "Pro triple-camera system with advanced telephoto" },
+          { subtopic: "Pro Features", detail: "ProRAW, ProRes, Log video" },
+        ],
+      },
+      {
+        topic: "Connectivity",
+        items: [{ subtopic: "USB-C", detail: "High-speed USB 3 (cable may be required)" }],
+      },
+      {
+        topic: "What's in the box",
+        items: [{ subtopic: "Included", detail: "iPhone 16 Pro, USB-C cable, documentation" }],
+      },
+    ],
+    createdAt: "2025-01-07T10:00:00.000Z",
+    updatedAt: "2025-09-10T12:00:00.000Z",
+  },
+
+  // ---- iPhone 16 Pro Max ----------------------------------------------------
+  {
+    infoId: 1004,
+    sections: [
+      {
+        topic: "Overview",
+        items: [
+          {
+            subtopic: "Highlights",
+            detail:
+              'Largest 6.9" ProMotion display, A18 Pro, best battery in the lineup, and the most advanced camera features.',
+          },
+        ],
+      },
+      {
+        topic: "Display & Design",
+        items: [
+          { subtopic: "Size", detail: '6.9" ProMotion OLED, up to 120Hz' },
+          { subtopic: "Build", detail: "Titanium frame, Ceramic Shield, IP68" },
+        ],
+      },
+      {
+        topic: "Camera",
+        items: [
+          { subtopic: "System", detail: "Pro triple-camera with advanced telephoto and macro" },
+          { subtopic: "Video", detail: "ProRes, 4K60, advanced stabilization" },
+        ],
+      },
+      {
+        topic: "Battery & Charging",
+        items: [{ subtopic: "Battery", detail: "Longest battery life in the iPhone 16 family" }],
+      },
+      {
+        topic: "What's in the box",
+        items: [{ subtopic: "Included", detail: "iPhone 16 Pro Max, USB-C cable, documentation" }],
+      },
+    ],
+    createdAt: "2025-01-07T11:00:00.000Z",
+    updatedAt: "2025-09-10T12:00:00.000Z",
+  },
+
+  // ---- iPhone 15 ------------------------------------------------------------
+  {
+    infoId: 1005,
+    sections: [
+      {
+        topic: "Overview",
+        items: [
+          {
+            subtopic: "Highlights",
+            detail:
+              "A17 chip, great dual-camera system, Dynamic Island, and lightweight build with excellent value.",
+          },
+          { subtopic: "Condition", detail: "Open Box unit in like-new condition unless otherwise specified." },
+        ],
+      },
+      {
+        topic: "Display",
+        items: [{ subtopic: "Size", detail: '6.1" OLED Super Retina display' }],
+      },
+      {
+        topic: "Battery & Charging",
+        items: [{ subtopic: "Charging", detail: "USB-C, MagSafe & Qi wireless" }],
+      },
+      {
+        topic: "What's in the box",
+        items: [{ subtopic: "Included", detail: "iPhone 15, USB-C cable, documentation" }],
+      },
+    ],
+    createdAt: "2024-10-10T09:00:00.000Z",
+    updatedAt: "2025-02-01T09:00:00.000Z",
+  },
+
+  // ---- iPhone 15 Pro --------------------------------------------------------
+  {
+    infoId: 1006,
+    sections: [
+      {
+        topic: "Overview",
+        items: [
+          { subtopic: "Highlights", detail: "Titanium design, A17 Pro, Pro cameras, Action button." },
+          { subtopic: "Condition", detail: "Brand New." },
+        ],
+      },
+      {
+        topic: "Display & Design",
+        items: [
+          { subtopic: "Size", detail: '6.1" ProMotion OLED up to 120Hz' },
+          { subtopic: "Build", detail: "Titanium frame, Ceramic Shield, IP68" },
+        ],
+      },
+      {
+        topic: "Connectivity",
+        items: [{ subtopic: "USB-C", detail: "USB 3 speeds with compatible cable" }],
+      },
+    ],
+    createdAt: "2023-10-01T10:00:00.000Z",
+    updatedAt: "2024-12-15T10:00:00.000Z",
+  },
+
+  // ---- iPhone 14 ------------------------------------------------------------
+  {
+    infoId: 1007,
+    sections: [
+      {
+        topic: "Overview",
+        items: [
+          { subtopic: "Highlights", detail: "A15 Bionic, solid camera, great everyday iPhone." },
+          { subtopic: "Condition", detail: "Refurbished with warranty." },
+        ],
+      },
+      {
+        topic: "Display",
+        items: [{ subtopic: "Size", detail: '6.1" OLED Super Retina display' }],
+      },
+      {
+        topic: "Battery & Charging",
+        items: [{ subtopic: "Charging", detail: "Lightning, MagSafe & Qi" }],
+      },
+    ],
+    createdAt: "2022-09-20T10:00:00.000Z",
+    updatedAt: "2024-11-20T10:00:00.000Z",
+  },
+
+  // ---- iPhone SE (3rd Gen) --------------------------------------------------
+  {
+    infoId: 1008,
+    sections: [
+      {
+        topic: "Overview",
+        items: [
+          { subtopic: "Highlights", detail: "Compact design, Touch ID, fast A-series chip, great price." },
+          { subtopic: "Condition", detail: "Brand New." },
+        ],
+      },
+      {
+        topic: "Display",
+        items: [{ subtopic: "Size", detail: '4.7" Retina HD display' }],
+      },
+      {
+        topic: "Battery & Charging",
+        items: [{ subtopic: "Charging", detail: "Lightning, Qi wireless charging" }],
+      },
+      {
+        topic: "Network & SIM",
+        items: [{ subtopic: "SIM", detail: "nano-SIM + eSIM (varies by region)" }],
+      },
+    ],
+    createdAt: "2022-03-10T09:00:00.000Z",
+    updatedAt: "2024-12-10T09:00:00.000Z",
+  },
 ];
 
+// Helper to retrieve by numeric infoId (works with numeric-string too)
 export function getInfoById(infoId) {
   const n = Number(infoId);
   if (Number.isNaN(n)) return undefined;
   return productInformation.find((p) => p.infoId === n);
 }
 
+// Keep your backend replacement IIFE intact — it will overwrite the dummies only if valid data comes back.
 (async function replaceWithBackendProductInformation() {
   try {
     const res = await fetch(`${API_URL}/product-information`);
@@ -881,7 +1204,6 @@ export function getInfoById(infoId) {
     }
 
     const json = await res.json();
-
     const payload = Array.isArray(json) ? json : (Array.isArray(json?.data) ? json.data : null);
 
     if (!Array.isArray(payload) || payload.length === 0) {

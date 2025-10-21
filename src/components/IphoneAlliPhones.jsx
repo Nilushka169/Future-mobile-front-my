@@ -3,6 +3,10 @@ import React, { useEffect, useState } from "react";
 import { Box, Container, Typography, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
+// ⬇️ Import the dummy phones you created.
+//    Adjust the relative path to wherever you saved the phones file (e.g., src/data/phones.jsx or src/phones.jsx)
+import { phones as fallbackPhones } from "../data/phones"; // ← update path if needed
+
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
 export default function IPhoneAlliPhones() {
@@ -17,20 +21,29 @@ export default function IPhoneAlliPhones() {
     async function fetchPhones() {
       try {
         setLoading(true);
+
+        // Try backend first
         const res = await fetch(`${API_URL}/phones`, { signal });
+
+        // If backend is down or not OK -> use dummy data
         if (!res.ok) {
-          console.error("Failed to fetch phones:", res.status);
-          setLoading(false);
-          return;
-        }
-        const data = await res.json();
-        if (!Array.isArray(data)) {
-          setPhones([]);
+          console.warn(`IPhoneAlliPhones: backend responded ${res.status} — using dummy phones`);
+          setPhones(fallbackPhones); // already normalized for your UI
           setLoading(false);
           return;
         }
 
-        // Normalize same as your other components expect
+        const data = await res.json();
+
+        // If backend returns nothing useful -> use dummy data
+        if (!Array.isArray(data) || data.length === 0) {
+          console.warn("IPhoneAlliPhones: backend returned no array — using dummy phones");
+          setPhones(fallbackPhones);
+          setLoading(false);
+          return;
+        }
+
+        // Normalize backend data to match your UI shape
         const normalized = data.map((p) => {
           const item = p && typeof p.toObject === "function" ? p.toObject() : p;
           return {
@@ -57,7 +70,8 @@ export default function IPhoneAlliPhones() {
         setPhones(normalized);
       } catch (err) {
         if (err.name === "AbortError") return;
-        console.error("fetchPhones error:", err);
+        console.warn("IPhoneAlliPhones: fetch failed — using dummy phones", err);
+        setPhones(fallbackPhones); // fall back on any fetch error
       } finally {
         setLoading(false);
       }
@@ -65,7 +79,6 @@ export default function IPhoneAlliPhones() {
 
     fetchPhones();
 
-    // cleanup on unmount
     return () => controller.abort();
   }, []);
 
@@ -104,12 +117,14 @@ export default function IPhoneAlliPhones() {
             alignItems: "center",
           }}
         >
-          {/* optional: show nothing while loading or show fallback */}
           {loading && phones.length === 0 ? (
-            // simple placeholder while loading
-            <Typography sx={{ gridColumn: "1/-1", textAlign: "center", p: 4 }}>Loading phones…</Typography>
+            <Typography sx={{ gridColumn: "1/-1", textAlign: "center", p: 4 }}>
+              Loading phones…
+            </Typography>
           ) : phones.length === 0 ? (
-            <Typography sx={{ gridColumn: "1/-1", textAlign: "center", p: 4 }}>No phones found.</Typography>
+            <Typography sx={{ gridColumn: "1/-1", textAlign: "center", p: 4 }}>
+              No phones found.
+            </Typography>
           ) : (
             phones.map((phone) => (
               <Box key={phone.id ?? phone._id} sx={{ textAlign: "center", maxWidth: 350, p: 2 }}>

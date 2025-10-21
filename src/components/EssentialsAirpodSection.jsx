@@ -3,7 +3,10 @@ import React, { useEffect, useState } from "react";
 import { Box, Container, Typography, Link } from "@mui/material";
 import PhoneSlider from "./ComponentCardSlider";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+// ⬇️ Dummy fallback import (update the path if your file lives elsewhere)
+import { accessories as fallbackAccessories, API_URL as FALLBACK_API_URL } from "../data/accessories";
+
+const API_URL = process.env.REACT_APP_API_URL || FALLBACK_API_URL || "http://localhost:5000/api";
 
 export default function EssentialsAirpodSection() {
   const [airpods, setAirpods] = useState([]);
@@ -11,38 +14,44 @@ export default function EssentialsAirpodSection() {
 
   useEffect(() => {
     const controller = new AbortController();
-    const signal = controller.signal;
+    const { signal } = controller;
 
     async function fetchAccessories() {
       try {
         setLoading(true);
+
+        // Try backend first
         const res = await fetch(`${API_URL}/accessories`, { signal });
         if (!res.ok) {
-          console.error("Failed to fetch accessories:", res.status);
-          setLoading(false);
-          return;
-        }
-        const data = await res.json();
-        if (!Array.isArray(data)) {
-          setAirpods([]);
+          console.warn(`EssentialsAirpodSection: backend responded ${res.status} — using dummy accessories`);
+          setAirpods(mapAndPickAirpods(fallbackAccessories));
           setLoading(false);
           return;
         }
 
-        // Normalize and filter AirPods
+        const data = await res.json();
+        if (!Array.isArray(data) || data.length === 0) {
+          console.warn("EssentialsAirpodSection: backend returned no array — using dummy accessories");
+          setAirpods(mapAndPickAirpods(fallbackAccessories));
+          setLoading(false);
+          return;
+        }
+
+        // Normalize backend payload and pick first 3 AirPods
         const normalized = data.map((a) => ({
           id: a.id ?? a._id,
           name: a.name ?? "Unnamed",
-          basePrice: Number(a.basePrice ?? 0),
+          basePrice: Number(a.basePrice ?? a.price ?? 0),
           img: a.img ?? (Array.isArray(a.images) && a.images[0]) ?? "",
           category: a.category ?? "",
         }));
 
-        const airpodsOnly = normalized.filter((a) => a.category === "AirPods").slice(0, 3);
-        setAirpods(airpodsOnly);
+        setAirpods(normalized.filter((a) => a.category === "AirPods").slice(0, 3));
       } catch (err) {
-        if (err.name === "AbortError") return;
-        console.error("fetchAccessories error:", err);
+        if (err.name !== "AbortError") {
+          console.warn("EssentialsAirpodSection: fetch failed — using dummy accessories", err);
+          setAirpods(mapAndPickAirpods(fallbackAccessories));
+        }
       } finally {
         setLoading(false);
       }
@@ -51,6 +60,21 @@ export default function EssentialsAirpodSection() {
     fetchAccessories();
     return () => controller.abort();
   }, []);
+
+  // Helper: map dummy accessories to slider shape, filter AirPods, take first 3
+  function mapAndPickAirpods(list) {
+    const safe = Array.isArray(list) ? list : [];
+    return safe
+      .filter((a) => a?.category === "AirPods")
+      .slice(0, 3)
+      .map((a) => ({
+        id: a.id ?? a._id,
+        name: a.name ?? "Unnamed",
+        basePrice: Number(a.basePrice ?? a.price ?? 0),
+        img: a.img ?? (Array.isArray(a.images) && a.images[0]) ?? "",
+        category: a.category ?? "",
+      }));
+  }
 
   return (
     <Box

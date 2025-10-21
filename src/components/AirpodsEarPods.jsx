@@ -3,7 +3,11 @@ import React, { useEffect, useState } from "react";
 import { Box, Container, Typography } from "@mui/material";
 import PhoneSlider from "./ComponentCardSlider";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+// ⬇️ Import the dummy accessories fallback
+// Adjust the path according to your project structure
+import { accessories as fallbackAccessories, API_URL as FALLBACK_API_URL } from "../data/accessories";
+
+const API_URL = process.env.REACT_APP_API_URL || FALLBACK_API_URL || "http://localhost:5000/api";
 
 export default function AirpodsEarPods() {
   const [earpods, setEarpods] = useState([]);
@@ -11,26 +15,31 @@ export default function AirpodsEarPods() {
 
   useEffect(() => {
     const controller = new AbortController();
-    const signal = controller.signal;
+    const { signal } = controller;
 
     async function fetchEarpods() {
       try {
         setLoading(true);
+
+        // Try backend first
         const res = await fetch(`${API_URL}/accessories`, { signal });
+
         if (!res.ok) {
-          console.error("Failed to fetch accessories:", res.status);
-          setEarpods([]);
+          console.warn(`AirpodsEarPods: backend responded ${res.status} — using dummy data`);
+          setEarpods(mapAndFilterEarpods(fallbackAccessories));
           setLoading(false);
           return;
         }
 
         const data = await res.json();
-        if (!Array.isArray(data)) {
-          setEarpods([]);
+        if (!Array.isArray(data) || data.length === 0) {
+          console.warn("AirpodsEarPods: backend returned no array — using dummy data");
+          setEarpods(mapAndFilterEarpods(fallbackAccessories));
           setLoading(false);
           return;
         }
 
+        // Normalize backend data
         const normalized = data.map((a) => ({
           id: a.id ?? a._id,
           name: a.name ?? "Unnamed",
@@ -39,13 +48,11 @@ export default function AirpodsEarPods() {
           category: a.category ?? "",
         }));
 
-        const earpodsData = normalized.filter((item) => item.category === "EarPods");
-
-        setEarpods(earpodsData);
+        setEarpods(normalized.filter((item) => item.category === "EarPods"));
       } catch (err) {
         if (err.name !== "AbortError") {
-          console.error("fetchEarpods error:", err);
-          setEarpods([]);
+          console.warn("AirpodsEarPods: fetch failed — using dummy data", err);
+          setEarpods(mapAndFilterEarpods(fallbackAccessories));
         }
       } finally {
         setLoading(false);
@@ -55,6 +62,19 @@ export default function AirpodsEarPods() {
     fetchEarpods();
     return () => controller.abort();
   }, []);
+
+  function mapAndFilterEarpods(list) {
+    const safe = Array.isArray(list) ? list : [];
+    return safe
+      .filter((i) => i?.category === "EarPods")
+      .map((a) => ({
+        id: a.id ?? a._id,
+        name: a.name ?? "Unnamed",
+        basePrice: Number(a.basePrice ?? a.price ?? 0),
+        img: a.img ?? (Array.isArray(a.images) && a.images[0]) ?? "",
+        category: a.category ?? "",
+      }));
+  }
 
   return (
     <Box

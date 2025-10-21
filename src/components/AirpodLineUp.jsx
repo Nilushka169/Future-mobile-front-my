@@ -1,10 +1,13 @@
 // src/components/AirPodLineUp.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Box, Container, Typography, Stack } from "@mui/material";
 import PhoneSlider from "./ComponentCardSlider";
 import { CiSearch, CiFilter } from "react-icons/ci";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+// ⬇️ Import dummy accessories fallback (adjust the path if yours differs)
+import { accessories as fallbackAccessories, API_URL as FALLBACK_API_URL } from "../data/accessories";
+
+const API_URL = process.env.REACT_APP_API_URL || FALLBACK_API_URL || "http://localhost:5000/api";
 
 export default function AirPodLineUp() {
   const [airpods, setAirpods] = useState([]);
@@ -12,26 +15,31 @@ export default function AirPodLineUp() {
 
   useEffect(() => {
     const controller = new AbortController();
-    const signal = controller.signal;
+    const { signal } = controller;
 
     async function fetchAirpods() {
       try {
         setLoading(true);
+
+        // Try backend first
         const res = await fetch(`${API_URL}/accessories`, { signal });
+
         if (!res.ok) {
-          console.error("Failed to fetch accessories:", res.status);
-          setAirpods([]);
+          console.warn(`AirPodLineUp: backend responded ${res.status} — using dummy accessories`);
+          setAirpods(mapAndFilterAirpods(fallbackAccessories));
           setLoading(false);
           return;
         }
 
         const data = await res.json();
-        if (!Array.isArray(data)) {
-          setAirpods([]);
+        if (!Array.isArray(data) || data.length === 0) {
+          console.warn("AirPodLineUp: backend returned no array — using dummy accessories");
+          setAirpods(mapAndFilterAirpods(fallbackAccessories));
           setLoading(false);
           return;
         }
 
+        // Normalize backend payload, then filter to AirPods
         const normalized = data.map((a) => ({
           id: a.id ?? a._id,
           name: a.name ?? "Unnamed",
@@ -39,14 +47,11 @@ export default function AirPodLineUp() {
           img: a.img ?? (Array.isArray(a.images) && a.images[0]) ?? "",
           category: a.category ?? "",
         }));
-
-        const airpodsData = normalized.filter((item) => item.category === "AirPods");
-
-        setAirpods(airpodsData);
+        setAirpods(normalized.filter((i) => i.category === "AirPods"));
       } catch (err) {
         if (err.name !== "AbortError") {
-          console.error("fetchAirpods error:", err);
-          setAirpods([]);
+          console.warn("AirPodLineUp: fetch failed — using dummy accessories", err);
+          setAirpods(mapAndFilterAirpods(fallbackAccessories));
         }
       } finally {
         setLoading(false);
@@ -56,6 +61,22 @@ export default function AirPodLineUp() {
     fetchAirpods();
     return () => controller.abort();
   }, []);
+
+  // Helper to map dummy items to the shape PhoneSlider expects, filtered by category
+  function mapAndFilterAirpods(list) {
+    const safe = Array.isArray(list) ? list : [];
+    return safe
+      .filter((i) => i?.category === "AirPods")
+      .map((a) => ({
+        id: a.id ?? a._id,
+        name: a.name ?? "Unnamed",
+        basePrice: Number(a.basePrice ?? a.price ?? 0),
+        img: a.img ?? (Array.isArray(a.images) && a.images[0]) ?? "",
+        category: a.category ?? "",
+      }));
+  }
+
+  const hasItems = useMemo(() => airpods.length > 0, [airpods]);
 
   return (
     <Box
@@ -70,8 +91,7 @@ export default function AirPodLineUp() {
           right: 0,
           zIndex: 3,
           height: "400px",
-          background:
-            "linear-gradient(to top, white 10%, rgba(255, 255, 255, 0) 100%)",
+          background: "linear-gradient(to top, white 10%, rgba(255, 255, 255, 0) 100%)",
           pointerEvents: "none",
         },
         py: 10,
@@ -104,11 +124,11 @@ export default function AirPodLineUp() {
         </Box>
 
         <Box sx={{ pt: 3 }}>
-          {loading ? (
+          {loading && !hasItems ? (
             <Typography align="center" sx={{ py: 4 }}>
               Loading AirPods…
             </Typography>
-          ) : airpods.length === 0 ? (
+          ) : !loading && !hasItems ? (
             <Typography align="center" sx={{ py: 4 }}>
               No AirPods available.
             </Typography>

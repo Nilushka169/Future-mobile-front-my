@@ -4,7 +4,10 @@ import { Box, Container, Typography, Stack } from "@mui/material";
 import PhoneSlider from "./ComponentCardSlider";
 import VideoFrame2 from "./HomeVideo2";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+// ⬇️ Import dummy accessories fallback (update the path if yours differs)
+import { accessories as fallbackAccessories, API_URL as FALLBACK_API_URL } from "../data/accessories";
+
+const API_URL = process.env.REACT_APP_API_URL || FALLBACK_API_URL || "http://localhost:5000/api";
 
 export default function HomeAppleWatchSection() {
   const [watches, setWatches] = useState([]);
@@ -12,27 +15,31 @@ export default function HomeAppleWatchSection() {
 
   useEffect(() => {
     const controller = new AbortController();
-    const signal = controller.signal;
+    const { signal } = controller;
 
     async function fetchAccessories() {
       try {
         setLoading(true);
+
+        // Try backend first
         const res = await fetch(`${API_URL}/accessories`, { signal });
+
         if (!res.ok) {
-          console.error("Failed to fetch accessories:", res.status);
-          setWatches([]);
+          console.warn(`HomeAppleWatchSection: backend responded ${res.status} — using dummy accessories`);
+          setWatches(mapAndPickWatches(fallbackAccessories));
           setLoading(false);
           return;
         }
 
         const data = await res.json();
-        if (!Array.isArray(data)) {
-          setWatches([]);
+        if (!Array.isArray(data) || data.length === 0) {
+          console.warn("HomeAppleWatchSection: backend returned no array — using dummy accessories");
+          setWatches(mapAndPickWatches(fallbackAccessories));
           setLoading(false);
           return;
         }
 
-        // Normalize + filter Apple Watch items
+        // Normalize backend payload, then filter & take first 3 Apple Watch items
         const normalized = data.map((a) => ({
           id: a.id ?? a._id,
           name: a.name ?? "Unnamed",
@@ -41,15 +48,11 @@ export default function HomeAppleWatchSection() {
           category: a.category ?? "",
         }));
 
-        const appleWatches = normalized
-          .filter((item) => item.category === "Apple Watch")
-          .slice(0, 3);
-
-        setWatches(appleWatches);
+        setWatches(normalized.filter((i) => i.category === "Apple Watch").slice(0, 3));
       } catch (err) {
         if (err.name !== "AbortError") {
-          console.error("fetchAccessories error:", err);
-          setWatches([]);
+          console.warn("HomeAppleWatchSection: fetch failed — using dummy accessories", err);
+          setWatches(mapAndPickWatches(fallbackAccessories));
         }
       } finally {
         setLoading(false);
@@ -59,6 +62,21 @@ export default function HomeAppleWatchSection() {
     fetchAccessories();
     return () => controller.abort();
   }, []);
+
+  // Helper: map dummy items to slider shape, filter to Apple Watch, take first 3
+  function mapAndPickWatches(list) {
+    const safe = Array.isArray(list) ? list : [];
+    return safe
+      .filter((i) => i?.category === "Apple Watch")
+      .slice(0, 3)
+      .map((a) => ({
+        id: a.id ?? a._id,
+        name: a.name ?? "Unnamed",
+        basePrice: Number(a.basePrice ?? a.price ?? 0),
+        img: a.img ?? (Array.isArray(a.images) && a.images[0]) ?? "",
+        category: a.category ?? "",
+      }));
+  }
 
   return (
     <Box

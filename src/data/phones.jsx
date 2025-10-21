@@ -270,14 +270,193 @@
 // ];
 
 
+import image0 from "../assets/Future_Mobile_Images_14_1.png";
+import image1 from "../assets/Future_Mobile_Images_14_2.png";
+import image2 from "../assets/Future_Mobile_Images_14_3.png";
+import image3 from "../assets/Future_Mobile_Images_14_4.png";
+import image4 from "../assets/Future_Mobile_Images_14_2.png";
+import image5 from "../assets/Future_Mobile_Images_14_3.png";
+import image6 from "../assets/Future_Mobile_Images_14_4.png";
+import image7 from "../assets/Future_Mobile_Images_14_1.png";
+import image8 from "../assets/Future_Mobile_Images_14_2.png";
+import image9 from "../assets/Future_Mobile_Images_14_3.png";
+import image10 from "../assets/Future_Mobile_Images_14_4.png";
+// phones.jsx
 
+// Keep your existing API URL logic
+export const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
-
+// ---- DUMMY DATA (fallback) ---------------------------------------------------
+// These objects match what your ComponentProductDescription expects:
+// id, infoId, status, name, basePrice, img, images, colors, storages[], stock, isLatest
 export const phones = [
-  
+  {
+    id: "iph16-128",
+    infoId: "1001",
+    status: "Brand New",
+    name: "iPhone 13",
+    basePrice: 289000,
+    img: image0,
+    images: [
+      image1,
+      image2,
+      image3
+    ],
+    colors: ["Blue", "Midnight", "Pink", "White", "Green"],
+    storages: [
+      { option: "128 GB", price: 289000, stock: 8 },
+      { option: "256 GB", price: 319000, stock: 6 },
+      { option: "512 GB", price: 369000, stock: 3 }
+    ],
+    stock: 17,
+    isLatest: true
+  },
+  {
+    id: "iph16p-256",
+    infoId: "1002",
+    status: "Brand New",
+    name: "iPhone 16 Plus",
+    basePrice: 349000,
+    img: image4,
+    images: [
+      image1,
+      image2,
+      image3
+    ],
+    colors: ["White (iPhone 16)", "Midnight (iPhone 16)", "Teal (iPhone 16)", "Pink (iPhone 16)"],
+    storages: [
+      { option: "128 GB", price: 349000, stock: 5 },
+      { option: "256 GB", price: 379000, stock: 7 },
+      { option: "512 GB", price: 429000, stock: 2 }
+    ],
+    stock: 14,
+    isLatest: true
+  },
+  {
+    id: "iph16pro-256",
+    infoId: "1003",
+    status: "Brand New",
+    name: "iPhone 16 Pro",
+    basePrice: 469000,
+    img: image5,
+    images: [
+      image1,
+      image2,
+      image3
+    ],
+    colors: ["Natural Titanium", "Blue (iPhone 16 Pro)", "Black Titanium (iPhone 16 Pro)", "White Titanium"],
+    storages: [
+      { option: "256 GB", price: 469000, stock: 9 },
+      { option: "512 GB", price: 529000, stock: 4 },
+      { option: "1 TB", price: 589000, stock: 2 }
+    ],
+    stock: 15,
+    isLatest: true
+  },
+  {
+    id: "iph16promax-256",
+    infoId: "1004",
+    status: "Brand New",
+    name: "iPhone 16 Pro Max",
+    basePrice: 529000,
+    img: image6,
+    images: [
+      image1,
+      image2,
+      image3
+    ],
+    colors: ["Natural Titanium", "Titanium Blue", "Black Titanium", "White Titanium"],
+    storages: [
+      { option: "256 GB", price: 529000, stock: 6 },
+      { option: "512 GB", price: 589000, stock: 3 },
+      { option: "1 TB", price: 649000, stock: 1 }
+    ],
+    stock: 10,
+    isLatest: true
+  },
+  {
+    id: "iph15-128",
+    infoId: "1005",
+    status: "Open Box",
+    name: "iPhone 15",
+    basePrice: 229000,
+    img: image7,
+    images: [
+      image1,
+      image2,
+      image3
+    ],
+    colors: ["Pink", "Blue", "Green", "Yellow", "Black"],
+    storages: [
+      { option: "128 GB", price: 229000, stock: 10 },
+      { option: "256 GB", price: 259000, stock: 7 }
+    ],
+    stock: 17,
+    isLatest: false
+  },
+  {
+    id: "iph15pro-256",
+    infoId: "1006",
+    status: "Brand New",
+    name: "iPhone 15 Pro",
+    basePrice: 399000,
+    img: image8,
+    images: [
+      image1,
+      image2,
+      image3
+    ],
+    colors: ["Black Titanium (iPhone 15 Pro)", "Blue Titanium", "Natural Titanium", "White Titanium"],
+    storages: [
+      { option: "256 GB", price: 399000, stock: 5 },
+      { option: "512 GB", price: 459000, stock: 3 }
+    ],
+    stock: 8,
+    isLatest: false
+  },
+  {
+    id: "iph14-128",
+    infoId: "1007",
+    status: "Refurbished",
+    name: "iPhone 14",
+    basePrice: 179000,
+    img: image9,
+    images: [
+      image1,
+      image2,
+      image3
+    ],
+    colors: ["Purple", "Midnight", "Starlight", "Blue", "Red"],
+    storages: [
+      { option: "128 GB", price: 179000, stock: 12 },
+      { option: "256 GB", price: 199000, stock: 6 }
+    ],
+    stock: 18,
+    isLatest: false
+  },
+  {
+    id: "se3-64",
+    infoId: "1008",
+    status: "Brand New",
+    name: "iPhone SE (3rd Gen)",
+    basePrice: 129000,
+    img: image10,
+    images: [
+      image1,
+      image2,
+      image3
+    ],
+    colors: ["Midnight", "Starlight", "(PRODUCT)RED"],
+    storages: [
+      { option: "64 GB", price: 129000, stock: 9 },
+      { option: "128 GB", price: 149000, stock: 5 }
+    ],
+    stock: 14,
+    isLatest: false
+  }
 ];
 
+// ---- OPTIONAL: Keep your original fetch replacement — will no-op if backend is absent ----
 (async function replaceWithBackendPhones() {
   try {
     const res = await fetch(`${API_URL}/phones`);
@@ -302,16 +481,19 @@ export const phones = [
         img: item.img ?? (Array.isArray(item.images) && item.images[0]) ?? "",
         images: Array.isArray(item.images) ? item.images.slice(0, 5) : item.images ? [item.images] : [],
         colors: Array.isArray(item.colors) ? item.colors : [],
-        storages: Array.isArray(item.storages) ? item.storages.map(s => ({
-          option: s.option,
-          price: Number(s.price ?? 0),
-          stock: typeof s.stock === "number" ? s.stock : (s.stock ? Number(s.stock) : 0)
-        })) : [],
+        storages: Array.isArray(item.storages)
+          ? item.storages.map((s) => ({
+              option: s.option,
+              price: Number(s.price ?? 0),
+              stock: typeof s.stock === "number" ? s.stock : s.stock ? Number(s.stock) : 0
+            }))
+          : [],
         stock: typeof item.stock === "number" ? item.stock : 0,
-        isLatest: Boolean(item.isLatest),
+        isLatest: Boolean(item.isLatest)
       };
     });
 
+    // Replace fallback with backend data if available
     phones.length = 0;
     phones.push(...normalized);
     console.log(`phones.jsx: replaced fallback with ${normalized.length} phones from backend`);

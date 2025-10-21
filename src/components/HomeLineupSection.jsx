@@ -1,34 +1,47 @@
-import React, { useEffect, useState } from "react";
-import { Box, Container, Typography, Link, CircularProgress } from "@mui/material";
-import PhoneSlider from "./ComponentCardSlider";
+// src/components/IphoneLatestiPhone.jsx
+import React, { useEffect, useState, useMemo } from "react";
+import { Box, Container, Typography, Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
-const API_URL = process.env.REACT_APP_API_URL;
+// ⬇️ Import your dummy phones fallback
+// Adjust the path to wherever you put the phones file (e.g. "../data/phones", "../../phones")
+import { phones as fallbackPhones, API_URL as FALLBACK_API_URL } from "../data/phones";
 
-function HomeLineupSection() {
-const [phones, setPhones] = useState([]);
+const API_URL = process.env.REACT_APP_API_URL || FALLBACK_API_URL || "http://localhost:5000/api";
+
+export default function IphoneLatestiPhone() {
+  const navigate = useNavigate();
+  const [phones, setPhones] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const controller = new AbortController();
-    const signal = controller.signal;
+    const { signal } = controller;
 
     async function fetchPhones() {
       try {
         setLoading(true);
+
+        // Try backend first
         const res = await fetch(`${API_URL}/phones`, { signal });
+
         if (!res.ok) {
-          console.error("Failed to fetch phones:", res.status);
-          setLoading(false);
-          return;
-        }
-        const data = await res.json();
-        if (!Array.isArray(data)) {
-          setPhones([]);
+          console.warn(`IphoneLatestiPhone: backend responded ${res.status} — using dummy phones`);
+          setPhones(fallbackPhones);
           setLoading(false);
           return;
         }
 
-        // Normalize items so UI works with either backend object or mongoose doc
+        const data = await res.json();
+
+        if (!Array.isArray(data) || data.length === 0) {
+          console.warn("IphoneLatestiPhone: backend returned no array — using dummy phones");
+          setPhones(fallbackPhones);
+          setLoading(false);
+          return;
+        }
+
+        // Normalize to match your UI shape
         const normalized = data.map((p) => {
           const item = p && typeof p.toObject === "function" ? p.toObject() : p;
           return {
@@ -55,69 +68,144 @@ const [phones, setPhones] = useState([]);
         setPhones(normalized);
       } catch (err) {
         if (err.name === "AbortError") return;
-        console.error("fetchPhones error:", err);
+        console.warn("IphoneLatestiPhone: fetch failed — using dummy phones", err);
+        setPhones(fallbackPhones);
       } finally {
         setLoading(false);
       }
     }
 
     fetchPhones();
-
-    // cleanup
     return () => controller.abort();
   }, []);
 
+  const latestPhones = useMemo(
+    () => (Array.isArray(phones) ? phones.filter((p) => p?.isLatest === true) : []),
+    [phones]
+  );
+
   return (
-    <Box sx={{ 
-      bgcolor: "#F5F5F7", 
-      py: 10, 
-      mt: { xs: 6, md: 3 },
-      width: '100%',
-      overflow: 'hidden',
-      minHeight: loading ? '400px' : 'auto'
-    }}>
+    <Box
+      sx={{
+        bgcolor: "#fff",
+        py: { xs: 0, sm: 15 },
+        width: "100%",
+      }}
+    >
       <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
           <Typography
             variant="h4"
-            sx={{ 
-              fontFamily: "SFProDisplayRegular, sans-serif", 
+            sx={{
+              fontFamily: "SFProDisplayRegular, sans-serif",
               fontWeight: "bold",
-              fontSize: { xs: '2rem', sm: '3.5rem' }
+              fontSize: { xs: "1.5rem", sm: "3.5rem" },
             }}
           >
             The Lineup.
           </Typography>
-          <Link 
-            href="/iphone" 
-            underline="none" 
-            sx={{ 
-              color: "#0071e3", 
-              fontWeight: 500,
-              fontFamily: "SFProDisplayRegular, sans-serif",
-              fontSize: { xs: '0.875rem', sm: '1.5rem' }
-            }}
-          >
-            See all models ›
-          </Link>
         </Box>
-        
-        {loading ? (
-          <Box display="flex" justifyContent="center" alignItems="center" py={10}>
-            <CircularProgress size={40} sx={{ color: "#0071e3" }} />
-          </Box>
-        ) : phones.length === 0 ? (
-          <Box display="flex" justifyContent="center" alignItems="center" py={10}>
-            <Typography color="text.secondary">
-              No phones available at the moment.
+
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "repeat(2, 1fr)",
+              sm: "repeat(3, 1fr)",
+              md: "repeat(2, 1fr)",
+              lg: "repeat(4, 1fr)",
+            },
+            gap: { xs: 0, sm: 4, md: 6 },
+            justifyItems: "center",
+            alignItems: "center",
+          }}
+        >
+          {loading && latestPhones.length === 0 ? (
+            <Typography sx={{ gridColumn: "1/-1", textAlign: "center", p: 4 }}>
+              Loading phones…
             </Typography>
-          </Box>
-        ) : (
-          <PhoneSlider phones={phones} />
-        )}
+          ) : !loading && latestPhones.length === 0 ? (
+            <Typography sx={{ gridColumn: "1/-1", textAlign: "center", p: 4 }}>
+              No latest phones found.
+            </Typography>
+          ) : (
+            latestPhones.map((phone) => (
+              <Box key={phone.id ?? phone._id} sx={{ textAlign: "center", maxWidth: 350, p: 2 }}>
+                <Box
+                  component="img"
+                  src={phone.img || ""}
+                  alt={phone.name}
+                  sx={{ width: "100%", maxWidth: 350, mb: 2, objectFit: "contain" }}
+                />
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontFamily: "SFProDisplayRegular, sans-serif",
+                    fontWeight: "bold",
+                    fontSize: { xs: "1.1rem", sm: "1.5rem", md: "2rem" },
+                    minHeight: "6rem",
+                  }}
+                >
+                  {phone.name}
+                </Typography>
+
+                <Typography sx={{ color: "text.secondary", mb: 1 }}>Latest</Typography>
+
+                <Typography sx={{ color: "text.secondary", mb: 1 }}>
+                  From Rs. {Number(phone.basePrice || 0).toLocaleString("en-LK")}.00
+                </Typography>
+
+                <Box
+                  display="flex"
+                  justifyContent={{ xs: "center", sm: "center", md: "space-around" }}
+                  alignItems="center"
+                  flexDirection={{ xs: "column", sm: "column", md: "row" }}
+                  gap={{ xs: 1.5, sm: 0 }}
+                >
+                  <Button
+                    onClick={() =>
+                      navigate(`/product/${phone.id}`, {
+                        state: { productData: phone, scrollTo: "description" },
+                      })
+                    }
+                    sx={{
+                      color: "#0071e3",
+                      fontWeight: 500,
+                      fontSize: { sm: "0.75rem", md: "1.2rem" },
+                      whiteSpace: "nowrap",
+                      textTransform: "none",
+                      fontFamily: "SFProDisplayRegular, sans-serif",
+                      letterSpacing: "1px",
+                    }}
+                  >
+                    Learn more
+                  </Button>
+
+                  <Button
+                    variant="contained"
+                    onClick={() =>
+                      navigate(`/product/${phone.id}`, {
+                        state: { productData: phone, scrollTo: "top" },
+                      })
+                    }
+                    sx={{
+                      fontFamily: "SFProDisplayRegular, sans-serif",
+                      fontSize: { sm: "0.75rem", md: "1rem" },
+                      letterSpacing: "2px",
+                      bgcolor: "#0071e3",
+                      textTransform: "none",
+                      borderRadius: 20,
+                      "&:hover": { bgcolor: "#005bb5" },
+                    }}
+                  >
+                    Buy ›
+                  </Button>
+                </Box>
+              </Box>
+            ))
+          )}
+        </Box>
       </Container>
     </Box>
   );
 }
-
-export default HomeLineupSection;
