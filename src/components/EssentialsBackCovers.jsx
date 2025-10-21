@@ -1,12 +1,16 @@
 // src/components/EssentialBackCovers.jsx
 import React, { useEffect, useState } from "react";
 import { Box, Container, Typography } from "@mui/material";
-import ComponentEssentialsCard from "./ComponentEssentialsProductCard";
+import ProductCard from "./ComponentProductCard"; // ⬅️ use the shared ProductCard
 
 // ⬇️ Import dummy accessories fallback (adjust path if needed)
-import { accessories as fallbackAccessories, API_URL as FALLBACK_API_URL } from "../data/accessories";
+import {
+  accessories as fallbackAccessories,
+  API_URL as FALLBACK_API_URL,
+} from "../data/accessories";
 
-const API_URL = process.env.REACT_APP_API_URL || FALLBACK_API_URL || "http://localhost:5000/api";
+const API_URL =
+  process.env.REACT_APP_API_URL || FALLBACK_API_URL || "http://localhost:5000/api";
 
 export default function EssentialBackCovers() {
   const [covers, setCovers] = useState([]);
@@ -24,7 +28,9 @@ export default function EssentialBackCovers() {
         const res = await fetch(`${API_URL}/accessories`, { signal });
 
         if (!res.ok) {
-          console.warn(`EssentialBackCovers: backend responded ${res.status} — using dummy accessories`);
+          console.warn(
+            `EssentialBackCovers: backend responded ${res.status} — using dummy accessories`
+          );
           setCovers(mapAndFilterCovers(fallbackAccessories));
           setLoading(false);
           return;
@@ -32,7 +38,9 @@ export default function EssentialBackCovers() {
 
         const data = await res.json();
         if (!Array.isArray(data) || data.length === 0) {
-          console.warn("EssentialBackCovers: backend returned no array — using dummy accessories");
+          console.warn(
+            "EssentialBackCovers: backend returned no array — using dummy accessories"
+          );
           setCovers(mapAndFilterCovers(fallbackAccessories));
           setLoading(false);
           return;
@@ -60,7 +68,10 @@ export default function EssentialBackCovers() {
         setCovers(normalized.filter((a) => a.category === "Back Cover"));
       } catch (err) {
         if (err.name !== "AbortError") {
-          console.warn("EssentialBackCovers: fetch failed — using dummy accessories", err);
+          console.warn(
+            "EssentialBackCovers: fetch failed — using dummy accessories",
+            err
+          );
           setCovers(mapAndFilterCovers(fallbackAccessories));
         }
       } finally {
@@ -141,14 +152,13 @@ export default function EssentialBackCovers() {
             </Typography>
           ) : (
             covers.map((item) => (
-              <ComponentEssentialsCard
+              <ProductCard
                 key={item.id}
-                id={item.id}
+                id={item.id}            // ⬅️ route id
                 name={item.name}
                 basePrice={item.basePrice}
-                image={item.img}
-                type={item.tags?.[0]}
-                productData={item}
+                img={item.img}
+                productData={item}     // ⬅️ passed to product page
               />
             ))
           )}

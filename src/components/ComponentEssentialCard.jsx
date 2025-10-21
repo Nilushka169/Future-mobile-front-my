@@ -8,7 +8,6 @@ function EssentialCard({ name, description, linkText, linkUrl, imageSrc }) {
         sx={{
           borderRadius: "20px",
           textAlign: "center",
-          p: { xs: 2, sm: 3 },
           gap: 2,
           boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
           transition: "transform 0.3s ease",

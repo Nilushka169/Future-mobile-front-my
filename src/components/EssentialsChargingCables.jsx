@@ -1,12 +1,16 @@
 // src/components/EssentialChargingCables.jsx
 import React, { useEffect, useState } from "react";
 import { Box, Container, Typography } from "@mui/material";
-import ComponentEssentialsCard from "./ComponentEssentialsProductCard";
+import ProductCard from "./ComponentProductCard"; // ⬅️ use the same ProductCard
 
 // ⬇️ Import dummy accessories fallback (adjust path if needed)
-import { accessories as fallbackAccessories, API_URL as FALLBACK_API_URL } from "../data/accessories";
+import {
+  accessories as fallbackAccessories,
+  API_URL as FALLBACK_API_URL,
+} from "../data/accessories";
 
-const API_URL = process.env.REACT_APP_API_URL || FALLBACK_API_URL || "http://localhost:5000/api";
+const API_URL =
+  process.env.REACT_APP_API_URL || FALLBACK_API_URL || "http://localhost:5000/api";
 
 export default function EssentialChargingCables() {
   const [cables, setCables] = useState([]);
@@ -24,7 +28,9 @@ export default function EssentialChargingCables() {
         const res = await fetch(`${API_URL}/accessories`, { signal });
 
         if (!res.ok) {
-          console.warn(`EssentialChargingCables: backend responded ${res.status} — using dummy accessories`);
+          console.warn(
+            `EssentialChargingCables: backend responded ${res.status} — using dummy accessories`
+          );
           setCables(mapAndFilterCables(fallbackAccessories));
           setLoading(false);
           return;
@@ -32,7 +38,9 @@ export default function EssentialChargingCables() {
 
         const data = await res.json();
         if (!Array.isArray(data) || data.length === 0) {
-          console.warn("EssentialChargingCables: backend returned no array — using dummy accessories");
+          console.warn(
+            "EssentialChargingCables: backend returned no array — using dummy accessories"
+          );
           setCables(mapAndFilterCables(fallbackAccessories));
           setLoading(false);
           return;
@@ -46,7 +54,12 @@ export default function EssentialChargingCables() {
             infoId: item.infoId ?? item.info_id,
             name: item.name ?? "Unnamed Accessory",
             basePrice: Number(item.basePrice ?? item.price ?? 0),
-            stock: typeof item.stock === "number" ? item.stock : item.stock ? Number(item.stock) : 0,
+            stock:
+              typeof item.stock === "number"
+                ? item.stock
+                : item.stock
+                ? Number(item.stock)
+                : 0,
             category: item.category ?? "",
             tags: Array.isArray(item.tags) ? item.tags : [],
             img: item.img ?? (Array.isArray(item.images) && item.images[0]) ?? "",
@@ -55,7 +68,8 @@ export default function EssentialChargingCables() {
               ? item.variants.map((v) => ({
                   option: v.option,
                   price: Number(v.price ?? 0),
-                  stock: typeof v.stock === "number" ? v.stock : v.stock ? Number(v.stock) : 0,
+                  stock:
+                    typeof v.stock === "number" ? v.stock : v.stock ? Number(v.stock) : 0,
                 }))
               : [],
           };
@@ -64,7 +78,10 @@ export default function EssentialChargingCables() {
         setCables(normalized.filter((n) => n.category === "Charging Cable"));
       } catch (err) {
         if (err.name !== "AbortError") {
-          console.warn("EssentialChargingCables: fetch failed — using dummy accessories", err);
+          console.warn(
+            "EssentialChargingCables: fetch failed — using dummy accessories",
+            err
+          );
           setCables(mapAndFilterCables(fallbackAccessories));
         }
       } finally {
@@ -86,7 +103,12 @@ export default function EssentialChargingCables() {
         infoId: item.infoId ?? item.info_id,
         name: item.name ?? "Unnamed Accessory",
         basePrice: Number(item.basePrice ?? item.price ?? 0),
-        stock: typeof item.stock === "number" ? item.stock : item.stock ? Number(item.stock) : 0,
+        stock:
+          typeof item.stock === "number"
+            ? item.stock
+            : item.stock
+            ? Number(item.stock)
+            : 0,
         category: item.category ?? "",
         tags: Array.isArray(item.tags) ? item.tags : [],
         img: item.img ?? (Array.isArray(item.images) && item.images[0]) ?? "",
@@ -95,7 +117,8 @@ export default function EssentialChargingCables() {
           ? item.variants.map((v) => ({
               option: v.option,
               price: Number(v.price ?? 0),
-              stock: typeof v.stock === "number" ? v.stock : v.stock ? Number(v.stock) : 0,
+              stock:
+                typeof v.stock === "number" ? v.stock : v.stock ? Number(v.stock) : 0,
             }))
           : [],
       }));
@@ -146,14 +169,13 @@ export default function EssentialChargingCables() {
             </Typography>
           ) : (
             cables.map((item) => (
-              <ComponentEssentialsCard
+              <ProductCard
                 key={item.id}
-                id={item.id}
+                id={item.id}                 // ⬅️ route uses this id
                 name={item.name}
                 basePrice={item.basePrice}
-                image={item.img}
-                type={item.tags?.[0]}
-                productData={item}
+                img={item.img}
+                productData={item}          // ⬅️ passed to product page
               />
             ))
           )}

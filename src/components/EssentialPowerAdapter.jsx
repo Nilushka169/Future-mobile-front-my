@@ -1,12 +1,15 @@
-// src/components/EssentialPowerAdapters.jsx
 import React, { useEffect, useState } from "react";
 import { Box, Container, Typography } from "@mui/material";
-import ComponentEssentialsCard from "./ComponentEssentialsProductCard";
+import ProductCard from "./ComponentProductCard";
 
-// ⬇️ Import the dummy accessories fallback (adjust path if needed)
-import { accessories as fallbackAccessories, API_URL as FALLBACK_API_URL } from "../data/accessories";
+// ⬇️ Dummy fallback (adjust path if yours differs)
+import {
+  accessories as fallbackAccessories,
+  API_URL as FALLBACK_API_URL,
+} from "../data/accessories";
 
-const API_URL = process.env.REACT_APP_API_URL || FALLBACK_API_URL || "http://localhost:5000/api";
+const API_URL =
+  process.env.REACT_APP_API_URL || FALLBACK_API_URL || "http://localhost:5000/api";
 
 export default function EssentialPowerAdapters() {
   const [adapters, setAdapters] = useState([]);
@@ -20,12 +23,12 @@ export default function EssentialPowerAdapters() {
       try {
         setLoading(true);
 
-        // Try backend first
         const res = await fetch(`${API_URL}/accessories`, { signal });
 
-        // If backend fails, use dummies
         if (!res.ok) {
-          console.warn(`EssentialPowerAdapters: backend responded ${res.status} — using dummy accessories`);
+          console.warn(
+            `EssentialPowerAdapters: backend responded ${res.status} — using dummy accessories`
+          );
           setAdapters(mapAndFilterAdapters(fallbackAccessories));
           setLoading(false);
           return;
@@ -33,13 +36,14 @@ export default function EssentialPowerAdapters() {
 
         const data = await res.json();
         if (!Array.isArray(data) || data.length === 0) {
-          console.warn("EssentialPowerAdapters: backend returned no array — using dummy accessories");
+          console.warn(
+            "EssentialPowerAdapters: backend returned no array — using dummy accessories"
+          );
           setAdapters(mapAndFilterAdapters(fallbackAccessories));
           setLoading(false);
           return;
         }
 
-        // Normalize backend payload then filter to Power Adapter
         const normalized = data.map((a) => ({
           id: a.id ?? a._id,
           infoId: a.infoId,
@@ -61,7 +65,10 @@ export default function EssentialPowerAdapters() {
         setAdapters(normalized.filter((a) => a.category === "Power Adapter"));
       } catch (err) {
         if (err.name !== "AbortError") {
-          console.warn("EssentialPowerAdapters: fetch failed — using dummy accessories", err);
+          console.warn(
+            "EssentialPowerAdapters: fetch failed — using dummy accessories",
+            err
+          );
           setAdapters(mapAndFilterAdapters(fallbackAccessories));
         }
       } finally {
@@ -73,7 +80,6 @@ export default function EssentialPowerAdapters() {
     return () => controller.abort();
   }, []);
 
-  // Map dummy items -> same shape; then filter to Power Adapter
   function mapAndFilterAdapters(list) {
     const safe = Array.isArray(list) ? list : [];
     return safe
@@ -142,13 +148,12 @@ export default function EssentialPowerAdapters() {
             </Typography>
           ) : (
             adapters.map((item) => (
-              <ComponentEssentialsCard
+              <ProductCard
                 key={item.id}
                 id={item.id}
                 name={item.name}
                 basePrice={item.basePrice}
-                image={item.img}
-                type={item.tags?.[0]}
+                img={item.img}
                 productData={item}
               />
             ))

@@ -16,9 +16,36 @@ function ProductCard({ id, name, basePrice, img, productData }) {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const navigate = useNavigate();
 
+  // Entire card = Buy action
+  const goBuy = () =>
+    navigate(`/product/${id}`, { state: { productData, scrollTo: "top" } });
+
+  const goLearnMore = (e) => {
+    e.stopPropagation(); // don't trigger card click
+    navigate(`/product/${id}`, {
+      state: { productData, scrollTo: "description" },
+    });
+  };
+
+  const handleBuyClick = (e) => {
+    e.stopPropagation(); // don't trigger card click twice
+    goBuy();
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      goBuy();
+    }
+  };
+
   return (
     <Card
-      // onClick={() => navigate(`/product/${id}`, { state: { productData } })}
+      role="button"
+      tabIndex={0}
+      aria-label={`${name} — open product page`}
+      onClick={goBuy}
+      onKeyDown={handleKeyDown}
       sx={{
         background: "transparent",
         boxShadow: "none",
@@ -32,6 +59,8 @@ function ProductCard({ id, name, basePrice, img, productData }) {
         mx: "auto",
         px: isMobile ? 0.5 : 2,
         cursor: "pointer",
+        transition: "transform 120ms ease, box-shadow 120ms ease",
+        "&:hover": { transform: "translateY(-2px)" },
       }}
     >
       <CardMedia
@@ -43,6 +72,7 @@ function ProductCard({ id, name, basePrice, img, productData }) {
           height: isMobile ? 200 : 400,
           width: "100%",
           mb: isMobile ? 1 : 2,
+          pointerEvents: "none", // ensure media doesn't swallow clicks
         }}
       />
 
@@ -96,8 +126,7 @@ function ProductCard({ id, name, basePrice, img, productData }) {
           flexDirection={isMobile ? "column" : "row"}
         >
           <Button
-            onClick={() => navigate(`/product/${id}`, { state: { productData, scrollTo: "description" } })}
-            underline="none"
+            onClick={goLearnMore}
             sx={{
               color: "#0071e3",
               fontFamily: "SFProDisplayRegular, sans-serif",
@@ -113,7 +142,7 @@ function ProductCard({ id, name, basePrice, img, productData }) {
           </Button>
           <Button
             variant="contained"
-            onClick={() => navigate(`/product/${id}`, { state: { productData, scrollTo: "top" } })}
+            onClick={handleBuyClick}
             size={isMobile ? "small" : "medium"}
             sx={{
               fontFamily: "SFProDisplayRegular, sans-serif",

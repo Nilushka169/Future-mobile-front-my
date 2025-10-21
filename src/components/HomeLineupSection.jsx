@@ -2,9 +2,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Box, Container, Typography, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-
-// ⬇️ Import your dummy phones fallback
-// Adjust the path to wherever you put the phones file (e.g. "../data/phones", "../../phones")
 import { phones as fallbackPhones, API_URL as FALLBACK_API_URL } from "../data/phones";
 
 const API_URL = process.env.REACT_APP_API_URL || FALLBACK_API_URL || "http://localhost:5000/api";
@@ -21,12 +18,9 @@ export default function IphoneLatestiPhone() {
     async function fetchPhones() {
       try {
         setLoading(true);
-
-        // Try backend first
         const res = await fetch(`${API_URL}/phones`, { signal });
 
         if (!res.ok) {
-          console.warn(`IphoneLatestiPhone: backend responded ${res.status} — using dummy phones`);
           setPhones(fallbackPhones);
           setLoading(false);
           return;
@@ -35,13 +29,11 @@ export default function IphoneLatestiPhone() {
         const data = await res.json();
 
         if (!Array.isArray(data) || data.length === 0) {
-          console.warn("IphoneLatestiPhone: backend returned no array — using dummy phones");
           setPhones(fallbackPhones);
           setLoading(false);
           return;
         }
 
-        // Normalize to match your UI shape
         const normalized = data.map((p) => {
           const item = p && typeof p.toObject === "function" ? p.toObject() : p;
           return {
@@ -68,7 +60,6 @@ export default function IphoneLatestiPhone() {
         setPhones(normalized);
       } catch (err) {
         if (err.name === "AbortError") return;
-        console.warn("IphoneLatestiPhone: fetch failed — using dummy phones", err);
         setPhones(fallbackPhones);
       } finally {
         setLoading(false);
@@ -84,14 +75,15 @@ export default function IphoneLatestiPhone() {
     [phones]
   );
 
+  const goToDescription = (phone, evt) => {
+    if (evt) evt.stopPropagation();
+    navigate(`/product/${phone.id}`, {
+      state: { productData: phone, scrollTo: "top" },
+    });
+  };
+
   return (
-    <Box
-      sx={{
-        bgcolor: "#fff",
-        py: { xs: 0, sm: 15 },
-        width: "100%",
-      }}
-    >
+    <Box sx={{ bgcolor: "#fff", py: { xs: 0, sm: 15 }, width: "100%" }}>
       <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
           <Typography
@@ -129,80 +121,103 @@ export default function IphoneLatestiPhone() {
               No latest phones found.
             </Typography>
           ) : (
-            latestPhones.map((phone) => (
-              <Box key={phone.id ?? phone._id} sx={{ textAlign: "center", maxWidth: 350, p: 2 }}>
+            latestPhones.map((phone) => {
+              const handleCardClick = () => goToDescription(phone);
+              const handleKeyDown = (e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  goToDescription(phone);
+                }
+              };
+
+              return (
                 <Box
-                  component="img"
-                  src={phone.img || ""}
-                  alt={phone.name}
-                  sx={{ width: "100%", maxWidth: 350, mb: 2, objectFit: "contain" }}
-                />
-                <Typography
-                  variant="h6"
+                  key={phone.id ?? phone._id}
+                  onClick={handleCardClick}
+                  onKeyDown={handleKeyDown}
+                  role="button"
+                  tabIndex={0}
                   sx={{
-                    fontFamily: "SFProDisplayRegular, sans-serif",
-                    fontWeight: "bold",
-                    fontSize: { xs: "1.1rem", sm: "1.5rem", md: "2rem" },
-                    minHeight: "6rem",
+                    textAlign: "center",
+                    maxWidth: 350,
+                    p: 2,
+                    cursor: "pointer",
+                    outline: "none",
+                    borderRadius: 2,
+                    "&:focus-visible": { boxShadow: (t) => `0 0 0 3px ${t.palette.primary.main}33` },
                   }}
                 >
-                  {phone.name}
-                </Typography>
+                  <Box
+                    component="img"
+                    src={phone.img || ""}
+                    alt={phone.name}
+                    sx={{ width: "100%", maxWidth: 350, mb: 2, objectFit: "contain" }}
+                  />
 
-                <Typography sx={{ color: "text.secondary", mb: 1 }}>Latest</Typography>
-
-                <Typography sx={{ color: "text.secondary", mb: 1 }}>
-                  From Rs. {Number(phone.basePrice || 0).toLocaleString("en-LK")}.00
-                </Typography>
-
-                <Box
-                  display="flex"
-                  justifyContent={{ xs: "center", sm: "center", md: "space-around" }}
-                  alignItems="center"
-                  flexDirection={{ xs: "column", sm: "column", md: "row" }}
-                  gap={{ xs: 1.5, sm: 0 }}
-                >
-                  <Button
-                    onClick={() =>
-                      navigate(`/product/${phone.id}`, {
-                        state: { productData: phone, scrollTo: "description" },
-                      })
-                    }
-                    sx={{
-                      color: "#0071e3",
-                      fontWeight: 500,
-                      fontSize: { sm: "0.75rem", md: "1.2rem" },
-                      whiteSpace: "nowrap",
-                      textTransform: "none",
-                      fontFamily: "SFProDisplayRegular, sans-serif",
-                      letterSpacing: "1px",
-                    }}
-                  >
-                    Learn more
-                  </Button>
-
-                  <Button
-                    variant="contained"
-                    onClick={() =>
-                      navigate(`/product/${phone.id}`, {
-                        state: { productData: phone, scrollTo: "top" },
-                      })
-                    }
+                  <Typography
+                    variant="h6"
                     sx={{
                       fontFamily: "SFProDisplayRegular, sans-serif",
-                      fontSize: { sm: "0.75rem", md: "1rem" },
-                      letterSpacing: "2px",
-                      bgcolor: "#0071e3",
-                      textTransform: "none",
-                      borderRadius: 20,
-                      "&:hover": { bgcolor: "#005bb5" },
+                      fontWeight: "bold",
+                      fontSize: { xs: "1.1rem", sm: "1.5rem", md: "2rem" },
+                      minHeight: "6rem",
                     }}
                   >
-                    Buy ›
-                  </Button>
+                    {phone.name}
+                  </Typography>
+
+                  <Typography sx={{ color: "text.secondary", mb: 1 }}>Latest</Typography>
+
+                  <Typography sx={{ color: "text.secondary", mb: 1 }}>
+                    From Rs. {Number(phone.basePrice || 0).toLocaleString("en-LK")}.00
+                  </Typography>
+
+                  <Box
+                    display="flex"
+                    justifyContent={{ xs: "center", sm: "center", md: "space-around" }}
+                    alignItems="center"
+                    flexDirection={{ xs: "column", sm: "column", md: "row" }}
+                    gap={{ xs: 1.5, sm: 0 }}
+                  >
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation(); // keep card click from firing
+                        navigate(`/product/${phone.id}`, {
+                          state: { productData: phone, scrollTo: "description" },
+                        });
+                      }}
+                      sx={{
+                        color: "#0071e3",
+                        fontWeight: 500,
+                        fontSize: { sm: "0.75rem", md: "1.2rem" },
+                        whiteSpace: "nowrap",
+                        textTransform: "none",
+                        fontFamily: "SFProDisplayRegular, sans-serif",
+                        letterSpacing: "1px",
+                      }}
+                    >
+                      Learn more
+                    </Button>
+
+                    <Button
+                      variant="contained"
+                      onClick={(e) => goToDescription(phone, e)}
+                      sx={{
+                        fontFamily: "SFProDisplayRegular, sans-serif",
+                        fontSize: { sm: "0.75rem", md: "1rem" },
+                        letterSpacing: "2px",
+                        bgcolor: "#0071e3",
+                        textTransform: "none",
+                        borderRadius: 20,
+                        "&:hover": { bgcolor: "#005bb5" },
+                      }}
+                    >
+                      Buy ›
+                    </Button>
+                  </Box>
                 </Box>
-              </Box>
-            ))
+              );
+            })
           )}
         </Box>
       </Container>

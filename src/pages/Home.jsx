@@ -11,10 +11,11 @@ import HomeAirPodSection from "../components/HomeAirPodSection";
 import HomeEssentialSection from "../components/HomeEssentialSection";
 import HomeAbout from "../components/HomeAbout";
 import Footer from "../components/ComponentFooter";
+import ScrollIndicator from "../components/ScrollIndicator";
 
 function Home() {
   return (
-    <Box sx={{ textAlign: "center", mt: { xs: 0, sm: 4, md: 4 }, backgroundColor: "white" }}>
+    <Box sx={{ textAlign: "center", mt: { xs: 0, sm: 4, md: 4 }, backgroundColor: "white", overflowX: "hidden" }}>
       <HomeLogoText />
 
       <Stack
@@ -22,7 +23,7 @@ function Home() {
         spacing={2}
         justifyContent="center"
         alignItems="center"
-        sx={{ mt: 3, mb: { xs: 2, sm: 10, md: 10 } }}
+        sx={{ mt: 3, mb: { xs: 0, sm: 10, md: 10 } }}
       >
         <ContactUsButton />
         <ShopIphoneButton />
@@ -35,12 +36,14 @@ function Home() {
         sx={{ mt: 3, mb: { xs: 0, sm: 4, md: 4 } }}
       >
         <VideoFrame1 />
+        
       </Stack>
+      <ScrollIndicator target="next" ariaLabel="Scroll down" />
       <Box
         sx={{
           mt: { xs: 0, sm: 2, md: 2 },
           px: { xs: 2, sm: 4, md: 8 },
-          minHeight: { xs: "10dvh", sm: "22dvh", md: "25dvh" },
+          minHeight: { xs: "5dvh", sm: "22dvh", md: "25dvh" },
           mx: "auto",
           maxWidth: { xs: "100%", sm: "80%", md: "70%" },
         }}
@@ -50,14 +53,14 @@ function Home() {
           sx={{
             mt: 2,
             fontFamily: "SFProDisplayBold, sans-serif",
-            fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" },
+            fontSize: { xs: "1.3rem", sm: "2.5rem", md: "3rem" },
           }}
         >
           We specialize in Apple products bringing you the latest iPhones &
           premium accessories.
         </Typography>
       </Box>
-      <Box>
+      <Box sx={{mt: { xs: 5, sm: 0, md: 0 },}}>
         <HomeLineupSection />
       </Box>
       <Box>

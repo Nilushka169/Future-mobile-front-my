@@ -90,7 +90,7 @@ function HomeVideoFrame1() {
         .to(
           phoneContainerRef.current,
           {
-            scale: isXs ? 1.25 : 1.8,
+            scale: isXs ? 1.1 : 1.8,
             duration: 1,
             ease: "power2.inOut",
           },
